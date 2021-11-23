@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/dropdown",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Overlays contextual element such as lists, menus, and more.",
   "type": "module",
   "main": "dist/Dropdown.jsx",
