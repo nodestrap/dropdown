@@ -135,15 +135,11 @@ export function DropdownElement(props) {
     onActiveChange, // not implemented
     ...restProps } = props;
     // jsx:
-    return (<Element 
-    // other props:
-    {...restProps} 
-    // accessibilities:
-    {...{
-        tabIndex,
-    }} 
-    // classes:
-    mainClass={props.mainClass ?? sheet.main}/>);
+    return (React.createElement(Element, { ...restProps, ...{
+            tabIndex,
+        }, 
+        // classes:
+        mainClass: props.mainClass ?? sheet.main }));
 }
 export function Dropdown(props) {
     // styles:
@@ -216,30 +212,24 @@ export function Dropdown(props) {
         };
     }, [isVisible, targetRef]); // (re)run the setups & cleanups on every time the dropdown's visible & dropdown's target changes
     // jsx:
-    return (<Collapse 
-    // other props:
-    {...restProps} 
-    // semantics:
-    semanticTag={props.semanticTag ?? [null]} semanticRole={props.semanticRole ?? 'dialog'} 
-    // accessibilities:
-    {...{
-        active: activePassiveState.active,
-        inheritActive: false,
-    }} 
-    // popups:
-    {...{
-        targetRef,
-        popupPlacement,
-        popupModifiers,
-        popupPosition,
-    }} 
-    // variants:
-    nude={props.nude ?? true} 
-    // classes:
-    mainClass={props.mainClass ?? sheet.main} 
-    // events:
-    // watch [escape key] on the whole Dropdown, including DropdownElement & DropdownElement's children:
-    onKeyUp={(e) => {
+    return (React.createElement(Collapse, { ...restProps, 
+        // semantics:
+        semanticTag: props.semanticTag ?? [null], semanticRole: props.semanticRole ?? 'dialog', ...{
+            active: activePassiveState.active,
+            inheritActive: false,
+        }, ...{
+            targetRef,
+            popupPlacement,
+            popupModifiers,
+            popupPosition,
+        }, 
+        // variants:
+        nude: props.nude ?? true, 
+        // classes:
+        mainClass: props.mainClass ?? sheet.main, 
+        // events:
+        // watch [escape key] on the whole Dropdown, including DropdownElement & DropdownElement's children:
+        onKeyUp: (e) => {
             props.onKeyUp?.(e);
             if (!e.defaultPrevented) {
                 if ((e.key === 'Escape') || (e.code === 'Escape')) {
@@ -249,44 +239,40 @@ export function Dropdown(props) {
                     } // if
                 } // if
             } // if
-        }} onAnimationEnd={(e) => {
+        }, onAnimationEnd: (e) => {
             props.onAnimationEnd?.(e);
             // states:
             activePassiveState.handleAnimationEnd(e);
-        }}>
-            {isTypeOf(children, DropdownElement)
-            ?
-                <children.type 
-                // other props:
-                {...children.props} 
+        } }, isTypeOf(children, DropdownElement)
+        ?
+            React.createElement(children.type
+            // other props:
+            , { ...children.props, 
                 // essentials:
-                elmRef={(elm) => {
-                        setRef(children.props.elmRef, elm);
-                        setRef(elmRef, elm);
-                        setRef(childRef, elm);
-                    }} 
+                elmRef: (elm) => {
+                    setRef(children.props.elmRef, elm);
+                    setRef(elmRef, elm);
+                    setRef(childRef, elm);
+                }, 
                 // accessibilities:
-                tabIndex={tabIndex} 
+                tabIndex: tabIndex, 
                 // events:
-                onActiveChange={(newActive, closeType) => {
-                        children.props.onActiveChange?.(newActive, closeType);
-                        onActiveChange?.(newActive, closeType);
-                    }}/>
-            :
-                <DropdownElement 
+                onActiveChange: (newActive, closeType) => {
+                    children.props.onActiveChange?.(newActive, closeType);
+                    onActiveChange?.(newActive, closeType);
+                } })
+        :
+            React.createElement(DropdownElement, { 
                 // essentials:
-                elmRef={(elm) => {
-                        setRef(elmRef, elm);
-                        setRef(childRef, elm);
-                    }} 
+                elmRef: (elm) => {
+                    setRef(elmRef, elm);
+                    setRef(childRef, elm);
+                }, 
                 // accessibilities:
-                tabIndex={tabIndex} 
+                tabIndex: tabIndex, 
                 // events:
-                onActiveChange={(newActive, closeType) => {
-                        onActiveChange?.(newActive, closeType);
-                    }}>
-                    {children}
-                </DropdownElement>}
-        </Collapse>);
+                onActiveChange: (newActive, closeType) => {
+                    onActiveChange?.(newActive, closeType);
+                } }, children)));
 }
 export { Dropdown as default };
