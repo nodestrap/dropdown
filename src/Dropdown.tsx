@@ -113,7 +113,7 @@ export const useDropdownElementSheet = createUseSheet(() => [
             usesDropdownElement(),
         ]),
     ]),
-]);
+], /*sheetId :*/'2m976iztxw'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
 
 
 
@@ -174,7 +174,7 @@ export const useDropdownSheet = createUseSheet(() => [
             usesDropdownStates(),
         ]),
     ]),
-]);
+], /*sheetId :*/'q723ad22au'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
 
 
 
