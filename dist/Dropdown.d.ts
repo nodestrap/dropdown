@@ -1,12 +1,11 @@
 /// <reference types="react" />
 import { ElementProps } from '@nodestrap/element';
 import { PopupPlacement, PopupModifier, PopupPosition, OrientationName, OrientationVariant, CollapseProps } from '@nodestrap/collapse';
-export declare const usesDropdownElementLayout: () => import("@cssfn/cssfn").StyleCollection;
-export declare const usesDropdownElement: () => import("@cssfn/cssfn").StyleCollection;
+export declare const usesDropdownElementLayout: () => import("@cssfn/cssfn").Rule;
 export declare const useDropdownElementSheet: import("@cssfn/types").Factory<import("jss").Classes<"main">>;
-export declare const usesDropdownLayout: () => import("@cssfn/cssfn").StyleCollection;
-export declare const usesDropdownVariants: () => import("@cssfn/cssfn").StyleCollection;
-export declare const usesDropdownStates: () => import("@cssfn/cssfn").StyleCollection;
+export declare const usesDropdownLayout: () => import("@cssfn/cssfn").Rule;
+export declare const usesDropdownVariants: () => import("@cssfn/cssfn").Rule;
+export declare const usesDropdownStates: () => import("@cssfn/cssfn").Rule;
 export declare const useDropdownSheet: import("@cssfn/types").Factory<import("jss").Classes<"main">>;
 export declare const cssProps: import("@cssfn/css-config").Refs<{
     boxShadow: (string | number)[][];

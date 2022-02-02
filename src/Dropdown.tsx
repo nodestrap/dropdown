@@ -8,14 +8,13 @@ import {
 // cssfn:
 import {
     // compositions:
-    composition,
     mainComposition,
+    
+    
+    
+    // styles:
+    style,
     imports,
-    
-    
-    
-    // layouts:
-    layout,
 }                           from '@cssfn/cssfn'       // cssfn core
 import {
     // hooks:
@@ -87,82 +86,73 @@ import {
 
 // styles:
 export const usesDropdownElementLayout = () => {
-    return composition([
-        imports([
+    return style({
+        ...imports([
             // resets:
             stripoutFocusableElement(), // clear browser's default styles
         ]),
-        layout({
+        ...style({
             // customize:
             ...usesGeneralProps(usesPrefixedProps(cssProps, 'element')), // apply general cssProps starting with element***
         }),
-    ]);
+    });
 };
-export const usesDropdownElement = () => {
-    return composition([
+
+export const useDropdownElementSheet = createUseSheet(() => [
+    mainComposition(
         imports([
             // layouts:
             usesDropdownElementLayout(),
         ]),
-    ]);
-};
-
-export const useDropdownElementSheet = createUseSheet(() => [
-    mainComposition([
-        imports([
-            usesDropdownElement(),
-        ]),
-    ]),
+    ),
 ], /*sheetId :*/'2m976iztxw'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
 
 
 
 export const usesDropdownLayout = () => {
-    return composition([
-        imports([
+    return style({
+        ...imports([
             // layouts:
             usesCollapseLayout(),
         ]),
-        layout({
+        ...style({
             // customize:
             ...usesGeneralProps(cssProps), // apply general cssProps
         }),
-    ]);
+    });
 };
 export const usesDropdownVariants = () => {
     // dependencies:
     
     // layouts:
-    const [sizes] = usesSizeVariant((sizeName) => composition([
-        layout({
-            // overwrites propName = propName{SizeName}:
-            ...overwriteProps(cssDecls, usesSuffixedProps(cssProps, sizeName)),
-        }),
-    ]));
+    const [sizes] = usesSizeVariant((sizeName) => style({
+        // overwrites propName = propName{SizeName}:
+        ...overwriteProps(cssDecls, usesSuffixedProps(cssProps, sizeName)),
+    }));
     
     
     
-    return composition([
-        imports([
+    return style({
+        ...imports([
             // variants:
             usesCollapseVariants(),
             
             // layouts:
             sizes(),
         ]),
-    ]);
+    });
 };
 export const usesDropdownStates = () => {
-    return composition([
-        imports([
+    return style({
+        ...imports([
             // states:
             usesCollapseStates(),
         ]),
-    ]);
+    });
 };
 
 export const useDropdownSheet = createUseSheet(() => [
-    mainComposition([
+    mainComposition(
         imports([
             // layouts:
             usesDropdownLayout(),
@@ -173,7 +163,7 @@ export const useDropdownSheet = createUseSheet(() => [
             // states:
             usesDropdownStates(),
         ]),
-    ]),
+    ),
 ], /*sheetId :*/'q723ad22au'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
 
 
