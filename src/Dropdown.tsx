@@ -59,8 +59,8 @@ import {
 import {
     // general types:
     PopupPlacement,
-    PopupModifier,
-    PopupPosition,
+    PopupMiddleware,
+    PopupStrategy,
     
     
     
@@ -280,8 +280,11 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
         // popups:
         targetRef,
         popupPlacement = (((props.orientation ?? 'block') === 'block') ? 'bottom' : 'right'),
-        popupModifiers,
-        popupPosition,
+        popupMiddleware,
+        popupStrategy,
+        
+        popupAutoFlip  = true,
+        popupAutoShift = true,
         
         
         // actions:
@@ -394,12 +397,13 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
             
             
             // popups:
-            {...{
-                targetRef,
-                popupPlacement,
-                popupModifiers,
-                popupPosition,
-            }}
+            targetRef={targetRef}
+            popupPlacement={popupPlacement}
+            popupMiddleware={popupMiddleware}
+            popupStrategy={popupStrategy}
+            
+            popupAutoFlip={popupAutoFlip}
+            popupAutoShift={popupAutoShift}
             
             
             // variants:
@@ -493,4 +497,4 @@ export { Dropdown as default }
 
 export type { OrientationName, OrientationVariant }
 
-export type { PopupPlacement, PopupModifier, PopupPosition }
+export type { PopupPlacement, PopupMiddleware, PopupStrategy }

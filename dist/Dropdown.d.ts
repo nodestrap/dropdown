@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { ElementProps } from '@nodestrap/element';
-import { PopupPlacement, PopupModifier, PopupPosition, OrientationName, OrientationVariant, CollapseProps } from '@nodestrap/collapse';
+import { PopupPlacement, PopupMiddleware, PopupStrategy, OrientationName, OrientationVariant, CollapseProps } from '@nodestrap/collapse';
 export declare const usesDropdownElementLayout: () => import("@cssfn/cssfn").Rule;
 export declare const useDropdownElementSheet: import("@cssfn/types").Factory<import("jss").Classes<"main">>;
 export declare const usesDropdownLayout: () => import("@cssfn/cssfn").Rule;
@@ -27,4 +27,4 @@ export interface DropdownProps<TElement extends HTMLElement = HTMLElement, TClos
 export declare function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType = DropdownCloseType>(props: DropdownProps<TElement, TCloseType>): JSX.Element;
 export { Dropdown as default };
 export type { OrientationName, OrientationVariant };
-export type { PopupPlacement, PopupModifier, PopupPosition };
+export type { PopupPlacement, PopupMiddleware, PopupStrategy };

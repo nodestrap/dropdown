@@ -140,7 +140,7 @@ export function Dropdown(props) {
     inheritActive, // from accessibilities
     tabIndex, // from Dropdown
     // popups:
-    targetRef, popupPlacement = (((props.orientation ?? 'block') === 'block') ? 'bottom' : 'right'), popupModifiers, popupPosition, 
+    targetRef, popupPlacement = (((props.orientation ?? 'block') === 'block') ? 'bottom' : 'right'), popupMiddleware, popupStrategy, popupAutoFlip = true, popupAutoShift = true, 
     // actions:
     onActiveChange, 
     // children:
@@ -204,12 +204,9 @@ export function Dropdown(props) {
         semanticTag: props.semanticTag ?? [null], semanticRole: props.semanticRole ?? 'dialog', ...{
             active: activePassiveState.active,
             inheritActive: false,
-        }, ...{
-            targetRef,
-            popupPlacement,
-            popupModifiers,
-            popupPosition,
         }, 
+        // popups:
+        targetRef: targetRef, popupPlacement: popupPlacement, popupMiddleware: popupMiddleware, popupStrategy: popupStrategy, popupAutoFlip: popupAutoFlip, popupAutoShift: popupAutoShift, 
         // variants:
         nude: props.nude ?? true, 
         // classes:
