@@ -38,7 +38,6 @@ import {
 }                           from '@nodestrap/stripouts'
 import {
     // utilities:
-    isTypeOf,
     setRef,
 }                           from '@nodestrap/utilities'
 
@@ -46,7 +45,6 @@ import {
 import {
     // react components:
     ElementProps,
-    Element,
 }                           from '@nodestrap/element'
 import {
     // hooks:
@@ -85,7 +83,7 @@ import {
 
 
 // styles:
-export const usesDropdownElementLayout = () => {
+export const usesDropdownComponentLayout = () => {
     return style({
         ...imports([
             // resets:
@@ -93,16 +91,16 @@ export const usesDropdownElementLayout = () => {
         ]),
         ...style({
             // customize:
-            ...usesGeneralProps(usesPrefixedProps(cssProps, 'element')), // apply general cssProps starting with element***
+            ...usesGeneralProps(usesPrefixedProps(cssProps, 'component')), // apply general cssProps starting with component***
         }),
     });
 };
 
-export const useDropdownElementSheet = createUseSheet(() => [
+export const useDropdownComponentSheet = createUseSheet(() => [
     mainComposition(
         imports([
             // layouts:
-            usesDropdownElementLayout(),
+            usesDropdownComponentLayout(),
         ]),
     ),
 ], /*sheetId :*/'2m976iztxw'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
@@ -116,6 +114,15 @@ export const usesDropdownLayout = () => {
             usesCollapseLayout(),
         ]),
         ...style({
+            // layouts:
+            display        : 'flex',   // use block flexbox, so it takes the entire parent's width
+            flexDirection  : 'column', // items are stacked vertically
+            justifyContent : 'center', // center items (text, icon, etc) horizontally
+            alignItems     : 'center', // center items (text, icon, etc) vertically
+            flexWrap       : 'wrap',   // allows the items (text, icon, etc) to wrap to the next row if no sufficient width available
+            
+            
+            
             // customize:
             ...usesGeneralProps(cssProps), // apply general cssProps
         }),
@@ -206,57 +213,19 @@ export interface DropdownAction<TCloseType = DropdownCloseType>
 
 
 
-export interface DropdownElementProps<TElement extends HTMLElement = HTMLElement, TCloseType = DropdownCloseType>
+export interface DropdownComponentProps<TElement extends HTMLElement = HTMLElement, TCloseType = DropdownCloseType>
     extends
         DropdownAction<TCloseType>,
-        ElementProps<TElement>
+        Pick<ElementProps<TElement>, 'elmRef'>
 {
     // accessibilities:
     tabIndex? : number
 }
-export function DropdownElement<TElement extends HTMLElement = HTMLElement, TCloseType = DropdownCloseType>(props: DropdownElementProps<TElement, TCloseType>) {
-    // styles:
-    const sheet = useDropdownElementSheet();
-    
-    
-    
-    // rest props:
-    const {
-        // accessibilities:
-        tabIndex = -1,
-        
-        
-        // actions:
-        onActiveChange, // not implemented
-    ...restProps} = props;
-    
-    
-    
-    // jsx:
-    return (
-        <Element<TElement>
-            // other props:
-            {...restProps}
-            
-            
-            // accessibilities:
-            {...{
-                tabIndex,
-            }}
-            
-            
-            // classes:
-            mainClass={props.mainClass ?? sheet.main}
-        />
-    );
-}
-
-
 
 export interface DropdownProps<TElement extends HTMLElement = HTMLElement, TCloseType = DropdownCloseType>
     extends
         CollapseProps<TElement>,
-        DropdownElementProps<TElement, TCloseType>
+        DropdownComponentProps<TElement, TCloseType>
 {
 }
 export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType = DropdownCloseType>(props: DropdownProps<TElement, TCloseType>) {
@@ -268,7 +237,7 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
     // rest props:
     const {
         // essentials:
-        elmRef,        // moved to DropdownElement
+        elmRef,        // moved to DropdownComponent
         
         
         // accessibilities:
@@ -294,6 +263,12 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
         // children:
         children,
     ...restProps} = props;
+    
+    
+    
+    // verifies:
+    React.Children.only(children);
+    if (!React.isValidElement<DropdownComponentProps<TElement, TCloseType>>(children)) throw Error('Invalid child element.');
     
     
     
@@ -363,13 +338,17 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
         
         
         // setups:
-        document.addEventListener('click', handleClick);
-        document.addEventListener('focus', handleFocus, { capture: true }); // force `focus` as bubbling
+        const timeoutHandler = setTimeout(() => { // wait until the triggering <Dropdown>.open() event is fully fired, so it won't immediately trigger <Dropdown>.close()
+            document.addEventListener('click', handleClick);
+            document.addEventListener('focus', handleFocus, { capture: true }); // force `focus` as bubbling
+        }, 0);
         
         
         
         // cleanups:
         return () => {
+            clearTimeout(timeoutHandler);
+            
             document.removeEventListener('click', handleClick);
             document.removeEventListener('focus', handleFocus, { capture: true });
         };
@@ -378,6 +357,41 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
     
     
     // jsx:
+    const dropdownComponentRef = (elm: TElement | null) => {
+        setRef(children.props.elmRef, elm);
+        setRef(elmRef, elm);
+        setRef(childRef, elm);
+    };
+    const dropdownComponentProps : DropdownComponentProps<TElement, TCloseType> & { ref?: typeof dropdownComponentRef } = {
+        // essentials:
+        ref      : dropdownComponentRef,
+        elmRef   : dropdownComponentRef,
+        
+        
+        // accessibilities:
+        tabIndex : children.props.tabIndex ?? tabIndex,
+        
+        
+        // events:
+        onActiveChange: (newActive, closeType) => {
+            children.props.onActiveChange?.(newActive, closeType);
+            
+            
+            
+            onActiveChange?.(newActive, closeType);
+        },
+    };
+    switch (typeof(children.type)) {
+        case 'string':
+            delete dropdownComponentProps.elmRef;
+            delete dropdownComponentProps.onActiveChange;
+            break;
+        case 'function':
+            delete dropdownComponentProps.ref;
+            break;
+    } // switch
+    const dropdownComponent = React.cloneElement(children, dropdownComponentProps);
+    
     return (
         <Collapse<TElement>
             // other props:
@@ -415,7 +429,7 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
             
             
             // events:
-            // watch [escape key] on the whole Dropdown, including DropdownElement & DropdownElement's children:
+            // watch [escape key] on the whole Dropdown, including DropdownComponent & DropdownComponent's children:
             onKeyUp={(e) => {
                 props.onKeyUp?.(e);
                 
@@ -440,56 +454,7 @@ export function Dropdown<TElement extends HTMLElement = HTMLElement, TCloseType 
                 activePassiveState.handleAnimationEnd(e);
             }}
         >
-            {
-                isTypeOf<DropdownElementProps<TElement, TCloseType>>(children, DropdownElement)
-                ?
-                <children.type
-                    // other props:
-                    {...children.props}
-                    
-                    
-                    // essentials:
-                    elmRef={(elm) => {
-                        setRef(children.props.elmRef, elm);
-                        setRef(elmRef, elm);
-                        setRef(childRef, elm);
-                    }}
-                    
-                    
-                    // accessibilities:
-                    tabIndex={tabIndex}
-                    
-                    
-                    // events:
-                    onActiveChange={(newActive, closeType) => {
-                        children.props.onActiveChange?.(newActive, closeType);
-                        
-                        
-                        
-                        onActiveChange?.(newActive, closeType);
-                    }}
-                />
-                :
-                <DropdownElement<TElement, TCloseType>
-                    // essentials:
-                    elmRef={(elm) => {
-                        setRef(elmRef, elm);
-                        setRef(childRef, elm);
-                    }}
-                    
-                    
-                    // accessibilities:
-                    tabIndex={tabIndex}
-                    
-                    
-                    // events:
-                    onActiveChange={(newActive, closeType) => {
-                        onActiveChange?.(newActive, closeType);
-                    }}
-                >
-                    { children }
-                </DropdownElement>
-            }
+            {dropdownComponent}
         </Collapse>
     );
 }

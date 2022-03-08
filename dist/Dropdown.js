@@ -16,9 +16,7 @@ usesGeneralProps, usesPrefixedProps, usesSuffixedProps, overwriteProps, } from '
 import { stripoutFocusableElement, } from '@nodestrap/stripouts';
 import { 
 // utilities:
-isTypeOf, setRef, } from '@nodestrap/utilities';
-// nodestrap components:
-import { Element, } from '@nodestrap/element';
+setRef, } from '@nodestrap/utilities';
 import { 
 // hooks:
 usesSizeVariant, } from '@nodestrap/basic';
@@ -29,7 +27,7 @@ import {
 // styles:
 usesCollapseLayout, usesCollapseVariants, usesCollapseStates, Collapse, } from '@nodestrap/collapse';
 // styles:
-export const usesDropdownElementLayout = () => {
+export const usesDropdownComponentLayout = () => {
     return style({
         ...imports([
             // resets:
@@ -37,14 +35,14 @@ export const usesDropdownElementLayout = () => {
         ]),
         ...style({
             // customize:
-            ...usesGeneralProps(usesPrefixedProps(cssProps, 'element')), // apply general cssProps starting with element***
+            ...usesGeneralProps(usesPrefixedProps(cssProps, 'component')), // apply general cssProps starting with component***
         }),
     });
 };
-export const useDropdownElementSheet = createUseSheet(() => [
+export const useDropdownComponentSheet = createUseSheet(() => [
     mainComposition(imports([
         // layouts:
-        usesDropdownElementLayout(),
+        usesDropdownComponentLayout(),
     ])),
 ], /*sheetId :*/ '2m976iztxw'); // an unique salt for SSR support, ensures the server-side & client-side have the same generated class names
 export const usesDropdownLayout = () => {
@@ -54,6 +52,12 @@ export const usesDropdownLayout = () => {
             usesCollapseLayout(),
         ]),
         ...style({
+            // layouts:
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexWrap: 'wrap',
             // customize:
             ...usesGeneralProps(cssProps), // apply general cssProps
         }),
@@ -111,30 +115,13 @@ const isSelfOrDescendantOf = (element, desired) => {
     } while (parent);
     return false; // not the descendant of desired
 };
-export function DropdownElement(props) {
-    // styles:
-    const sheet = useDropdownElementSheet();
-    // rest props:
-    const { 
-    // accessibilities:
-    tabIndex = -1, 
-    // actions:
-    onActiveChange, // not implemented
-    ...restProps } = props;
-    // jsx:
-    return (React.createElement(Element, { ...restProps, ...{
-            tabIndex,
-        }, 
-        // classes:
-        mainClass: props.mainClass ?? sheet.main }));
-}
 export function Dropdown(props) {
     // styles:
     const sheet = useDropdownSheet();
     // rest props:
     const { 
     // essentials:
-    elmRef, // moved to DropdownElement
+    elmRef, // moved to DropdownComponent
     // accessibilities:
     active, // from accessibilities
     inheritActive, // from accessibilities
@@ -145,6 +132,10 @@ export function Dropdown(props) {
     onActiveChange, 
     // children:
     children, ...restProps } = props;
+    // verifies:
+    React.Children.only(children);
+    if (!React.isValidElement(children))
+        throw Error('Invalid child element.');
     // states:
     const activePassiveState = useActivePassiveState({ active, inheritActive: false });
     const isVisible = activePassiveState.active || (!!activePassiveState.class);
@@ -190,15 +181,45 @@ export function Dropdown(props) {
             onActiveChange(false, 'blur');
         };
         // setups:
-        document.addEventListener('click', handleClick);
-        document.addEventListener('focus', handleFocus, { capture: true }); // force `focus` as bubbling
+        const timeoutHandler = setTimeout(() => {
+            document.addEventListener('click', handleClick);
+            document.addEventListener('focus', handleFocus, { capture: true }); // force `focus` as bubbling
+        }, 0);
         // cleanups:
         return () => {
+            clearTimeout(timeoutHandler);
             document.removeEventListener('click', handleClick);
             document.removeEventListener('focus', handleFocus, { capture: true });
         };
     }, [isVisible, targetRef]); // (re)run the setups & cleanups on every time the dropdown's visible & dropdown's target changes
     // jsx:
+    const dropdownComponentRef = (elm) => {
+        setRef(children.props.elmRef, elm);
+        setRef(elmRef, elm);
+        setRef(childRef, elm);
+    };
+    const dropdownComponentProps = {
+        // essentials:
+        ref: dropdownComponentRef,
+        elmRef: dropdownComponentRef,
+        // accessibilities:
+        tabIndex: children.props.tabIndex ?? tabIndex,
+        // events:
+        onActiveChange: (newActive, closeType) => {
+            children.props.onActiveChange?.(newActive, closeType);
+            onActiveChange?.(newActive, closeType);
+        },
+    };
+    switch (typeof (children.type)) {
+        case 'string':
+            delete dropdownComponentProps.elmRef;
+            delete dropdownComponentProps.onActiveChange;
+            break;
+        case 'function':
+            delete dropdownComponentProps.ref;
+            break;
+    } // switch
+    const dropdownComponent = React.cloneElement(children, dropdownComponentProps);
     return (React.createElement(Collapse, { ...restProps, 
         // semantics:
         semanticTag: props.semanticTag ?? [null], semanticRole: props.semanticRole ?? 'dialog', ...{
@@ -212,7 +233,7 @@ export function Dropdown(props) {
         // classes:
         mainClass: props.mainClass ?? sheet.main, 
         // events:
-        // watch [escape key] on the whole Dropdown, including DropdownElement & DropdownElement's children:
+        // watch [escape key] on the whole Dropdown, including DropdownComponent & DropdownComponent's children:
         onKeyUp: (e) => {
             props.onKeyUp?.(e);
             if (!e.defaultPrevented) {
@@ -227,36 +248,6 @@ export function Dropdown(props) {
             props.onAnimationEnd?.(e);
             // states:
             activePassiveState.handleAnimationEnd(e);
-        } }, isTypeOf(children, DropdownElement)
-        ?
-            React.createElement(children.type
-            // other props:
-            , { ...children.props, 
-                // essentials:
-                elmRef: (elm) => {
-                    setRef(children.props.elmRef, elm);
-                    setRef(elmRef, elm);
-                    setRef(childRef, elm);
-                }, 
-                // accessibilities:
-                tabIndex: tabIndex, 
-                // events:
-                onActiveChange: (newActive, closeType) => {
-                    children.props.onActiveChange?.(newActive, closeType);
-                    onActiveChange?.(newActive, closeType);
-                } })
-        :
-            React.createElement(DropdownElement, { 
-                // essentials:
-                elmRef: (elm) => {
-                    setRef(elmRef, elm);
-                    setRef(childRef, elm);
-                }, 
-                // accessibilities:
-                tabIndex: tabIndex, 
-                // events:
-                onActiveChange: (newActive, closeType) => {
-                    onActiveChange?.(newActive, closeType);
-                } }, children)));
+        } }, dropdownComponent));
 }
 export { Dropdown as default };

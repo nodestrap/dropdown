@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/dropdown",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "description": "Overlays contextual element such as lists, menus, and more.",
   "type": "module",
   "main": "dist/Dropdown.js",
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/nodestrap/dropdown#readme",
   "dependencies": {
-    "@cssfn/css-config": "^1.0.4",
+    "@cssfn/css-config": "^1.0.5",
     "@cssfn/cssfn": "^1.0.12",
     "@cssfn/react-cssfn": "^1.0.11",
     "@nodestrap/basic": "^4.0.7",
