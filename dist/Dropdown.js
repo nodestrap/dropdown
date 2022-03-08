@@ -58,6 +58,8 @@ export const usesDropdownLayout = () => {
             justifyContent: 'center',
             alignItems: 'center',
             flexWrap: 'wrap',
+            // sizes:
+            inlineSize: 'fit-content',
             // customize:
             ...usesGeneralProps(cssProps), // apply general cssProps
         }),

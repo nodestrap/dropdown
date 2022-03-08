@@ -123,6 +123,11 @@ export const usesDropdownLayout = () => {
             
             
             
+            // sizes:
+            inlineSize     : 'fit-content',
+            
+            
+            
             // customize:
             ...usesGeneralProps(cssProps), // apply general cssProps
         }),
