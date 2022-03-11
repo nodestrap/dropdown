@@ -147,7 +147,13 @@ export function Dropdown(props) {
         if (!isVisible)
             return; // dropdown is not shown        => nothing to do
         // setups:
-        childRef.current?.focus({ preventScroll: true }); // when actived => focus the dropdown, so the user able to use [esc] key to close the dropdown
+        const timeoutHandler = setTimeout(() => {
+            childRef.current?.focus({ preventScroll: true }); // when actived => focus the dropdown, so the user able to use [esc] key to close the dropdown
+        }, 100); // give a bit time for floating-ui to load
+        // cleanups:
+        return () => {
+            clearTimeout(timeoutHandler);
+        };
     }, [isVisible]); // (re)run the setups on every time the dropdown's visible changes
     /*
         because `onActiveChange` might be different every time the Dropdown is rendered,

@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/dropdown",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "description": "Overlays contextual element such as lists, menus, and more.",
   "type": "module",
   "main": "dist/Dropdown.js",
@@ -40,7 +40,7 @@
     "@nodestrap/indicator": "^4.0.7",
     "@nodestrap/stripouts": "^4.0.2",
     "@nodestrap/utilities": "^4.0.3",
-    "@types/react": "^17.0.39",
+    "@types/react": "^17.0.40",
     "react": "^17.0.2"
   }
 }
